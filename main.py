@@ -33,9 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------------
-# CREATE SIMPLE DATASET
-# -------------------------
 data = []
 
 for _ in range(5000):
@@ -86,34 +83,40 @@ def predict(data: Transaction):
     time = data.time
     type = data.type
 
+
+
     # Simple logic (you can keep your AI logic here)
     if amount > 1000000:
-        return {
-            "fraud": True,
-            "confidence": 90,
-            "risk": "High Risk"
-        }
+        fraud = True
+        confidence = 90
+        risk = "High Risk"
 
     elif amount > 100000:
-        return {
-            "fraud": True,
-            "confidence": 70,
-            "risk": "Medium Risk"
-        }
-
-    elif time < 5 and amount > 50000:
-        return {
-            "fraud": True,
-            "confidence": 65,
-            "risk": "Medium Risk"
-        }
+        fraud = True
+        confidence = 70
+        risk = "Medium Risk"
 
     else:
-        return {
-            "fraud": False,
-            "confidence": 30,
-            "risk": "Low Risk"
-        }
+        fraud = False
+        confidence = 30
+        risk = "Low Risk"
+    
+    conn = sqlite3.connect("transactions.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO transactions (amount, time, type, fraud, confidence, risk)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (amount, time, type, fraud, confidence, risk))
+
+    conn.commit()
+    conn.close()
+
+    return {
+        "fraud": fraud,
+        "confidence": confidence,
+        "risk": risk
+    }
 
 @app.get("/history")
 def get_history():
@@ -135,3 +138,25 @@ def get_history():
 @app.get("/")
 def home():
     return FileResponse(os.path.join(os.getcwd(), "index.html"))
+
+@app.get("/history")
+def get_history():
+    conn = sqlite3.connect("transactions.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM transactions ORDER BY id DESC")
+    rows = cursor.fetchall()
+
+    data = []
+    for row in rows:
+        data.append({
+            "amount": row[1],
+            "time": row[2],
+            "type": row[3],
+            "fraud": row[4],
+            "confidence": row[5],
+            "risk": row[6]
+        })
+
+    conn.close()
+    return data

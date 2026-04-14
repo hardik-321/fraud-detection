@@ -98,7 +98,15 @@
     <input type="text" id="type" placeholder="Type (UPI/Card/International)">
 
     <button onclick="checkFraud()">Check Transaction</button>
+    <button onclick="loadHistory()">View Transaction History</button>
 
+    <div id="historyTable" style="
+        margin-top:20px;
+        max-height:300px;
+        overflow-y:auto;
+        border:1px solid #ccc;
+        padding:10px;
+    "></div>
     <div id="result"></div>
 </div>
 
@@ -149,6 +157,38 @@ async function checkFraud() {
         Confidence: ${data.confidence}%<br>
         <span class="badge ${badgeClass}">${riskLevel}</span>
     `;
+}
+async function loadHistory() {
+    let response = await fetch("https://fraud-detection-mdbv.onrender.com/history");
+    let data = await response.json();
+
+    let table = `
+        <table style="width:100%; border-collapse:collapse;" style="width:100%; text-align:center;">
+        <tr>
+            <th>Amount</th>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Risk</th>
+        </tr>
+    `;
+
+    data.forEach(tx => {
+        table += `
+        <tr>
+            <td>${tx.amount}</td>
+            <td>${tx.time}</td>
+            <td>${tx.type}</td>
+            <td style="color:${tx.fraud ? 'red' : 'green'}">
+                ${tx.fraud ? 'FRAUD' : 'SAFE'}
+            </td>
+            <td>${tx.risk}</td>
+        </tr>`;
+    });
+
+    table += `</table>`;
+
+    document.getElementById("historyTable").innerHTML = table;
 }
 </script>
 
