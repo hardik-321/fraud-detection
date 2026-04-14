@@ -124,19 +124,30 @@ async function checkFraud() {
     `;
     await new Promise(r => setTimeout(r, 800));
 
-    let response = await fetch("https://fraud-detection-mdbv.onrender.com/predict", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            amount: amount,
-            time: time,
-            type: type
-        })
-    });
+    try {
+        let response = await fetch("https://fraud-detection-mdbv.onrender.com/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                amount: amount,
+                time: time,
+                type: type
+            })
+        });
 
-    let data = await response.json();
+        let data = await response.json();
+
+        resultDiv.innerHTML =
+            (data.fraud ? "⚠ FRAUD DETECTED" : "✅ SAFE TRANSACTION") +
+            "<br>Confidence: " + data.confidence + "%" +
+            "<br>Risk: " + data.risk;
+
+    } catch (error) {
+        console.error(error);
+        resultDiv.innerHTML = "Error connecting to server";
+    }
 
     let riskLevel = "";
     let badgeClass = "";
