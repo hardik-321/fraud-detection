@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Fraud Detection Dashboard</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 350px;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #1d2671;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #c33764;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 8px;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1d2671;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .low { background: green; }
+        .medium { background: orange; }
+        .high { background: red; }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>💳 Fraud Detection</h1>
+
+    <input type="number" id="amount" placeholder="Enter Amount">
+    <input type="number" id="time" placeholder="Enter Time">
+    <input type="text" id="type" placeholder="Type (UPI/Card/International)">
+
+    <button onclick="checkFraud()">Check Transaction</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function checkFraud() {
+    let amount = document.getElementById("amount").value;
+    let time = document.getElementById("time").value;
+    let type = document.getElementById("type").value || "UPI";
+
+    let resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = `
+        <div class="loader"></div>
+        Analyzing transaction...
+    `;
+    await new Promise(r => setTimeout(r, 800));
+
+    let response = await fetch("https://fraud-detection-mdbv.onrender.com/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            amount: amount,
+            time: time,
+            type: type
+        })
+    });
+
+    let data = await response.json();
+
+    let riskLevel = "";
+    let badgeClass = "";
+
+    if (data.confidence > 70) {
+        riskLevel = "High Risk";
+        badgeClass = "high";
+    } else if (data.confidence > 40) {
+        riskLevel = "Medium Risk";
+        badgeClass = "medium";
+    } else {
+        riskLevel = "Low Risk";
+        badgeClass = "low";
+    }
+
+    resultDiv.innerHTML = `
+        ${data.fraud ? "⚠ FRAUD DETECTED" : "✅ SAFE TRANSACTION"}<br>
+        Confidence: ${data.confidence}%<br>
+        <span class="badge ${badgeClass}">${riskLevel}</span>
+    `;
+}
+</script>
+
+</body>
+</html>
