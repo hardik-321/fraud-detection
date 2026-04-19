@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+import joblib
+import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +30,7 @@ conn.commit()
 from sklearn.ensemble import RandomForestClassifier
 
 app = FastAPI()
+model = joblib.load("fraud_model.pkl")
 
 app.add_middleware(
     CORSMiddleware,
@@ -96,17 +99,22 @@ def predict(data: dict):
         time = float(data.get("time"))
         type_ = data.get("type")
 
-        # Dummy logic
-        if amount > 50000:
+        # Prepare input for model
+        input_data = np.array([[amount, time]])
+
+        # Predict
+        prediction = model.predict(input_data)[0]
+
+        if prediction == 1:
             fraud = True
-            confidence = 80
+            confidence = 90
             risk = "High Risk"
         else:
             fraud = False
             confidence = 30
             risk = "Low Risk"
 
-        # Save to DB (SAFE)
+        # Save to DB
         cursor.execute(
             "INSERT INTO transactions (amount, time, type, fraud, confidence, risk) VALUES (?, ?, ?, ?, ?, ?)",
             (amount, time, type_, fraud, confidence, risk)
