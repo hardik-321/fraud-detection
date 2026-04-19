@@ -104,18 +104,25 @@ def predict(data: dict):
         amount = min(amount, 5000)
         time = min(time, 200)
 
-        input_data = np.array([[amount, time]])
+        # Hybrid logic (AI + anomaly detection)
 
-        prediction = model.predict(input_data)[0]
-
-        if prediction == 1:
+        if amount > 1000000 or time > 2:
             fraud = True
-            confidence = 90
+            confidence = 95
             risk = "High Risk"
+
         else:
-            fraud = False
-            confidence = 30
-            risk = "Low Risk"
+            input_data = np.array([[amount, time]])
+            prediction = model.predict(input_data)[0]
+
+            if prediction == 1:
+                fraud = True
+                confidence = 80
+                risk = "High Risk"
+            else:
+                fraud = False
+                confidence = 30
+                risk = "Low Risk"
 
         # Save to DB
         cursor.execute(
