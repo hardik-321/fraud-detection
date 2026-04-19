@@ -10,13 +10,16 @@ import sqlite3
 conn = sqlite3.connect("transactions.db", check_same_thread=False)
 cursor = conn.cursor()
 
+cursor.execute("DROP TABLE IF EXISTS transactions")
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     amount REAL,
     time REAL,
     type TEXT,
-    fraud INTEGER,
-    confidence REAL
+    fraud BOOLEAN,
+    confidence REAL,
+    risk TEXT
 )
 """)
 
