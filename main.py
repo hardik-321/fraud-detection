@@ -100,9 +100,12 @@ def predict(data: dict):
         type_ = data.get("type")
 
         # Prepare input for model
+        # Normalize inputs (VERY IMPORTANT)
+        amount = min(amount, 5000)
+        time = min(time, 200)
+
         input_data = np.array([[amount, time]])
 
-        # Predict
         prediction = model.predict(input_data)[0]
 
         if prediction == 1:
