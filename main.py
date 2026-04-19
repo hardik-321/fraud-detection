@@ -87,45 +87,37 @@ class Transaction(BaseModel):
     type: str
 
 @app.post("/predict")
-def predict(data: Transaction):
-    amount = data.amount
-    time = data.time
-    type = data.type
+def predict(data: dict):
+    try:
+        amount = float(data.get("amount"))
+        time = float(data.get("time"))
+        type_ = data.get("type")
 
+        # Dummy logic
+        if amount > 50000:
+            fraud = True
+            confidence = 80
+            risk = "High Risk"
+        else:
+            fraud = False
+            confidence = 30
+            risk = "Low Risk"
 
+        # Save to DB (SAFE)
+        cursor.execute(
+            "INSERT INTO transactions (amount, time, type, fraud, confidence, risk) VALUES (?, ?, ?, ?, ?, ?)",
+            (amount, time, type_, fraud, confidence, risk)
+        )
+        conn.commit()
 
-    # Simple logic (you can keep your AI logic here)
-    if amount > 1000000:
-        fraud = True
-        confidence = 90
-        risk = "High Risk"
+        return {
+            "fraud": fraud,
+            "confidence": confidence,
+            "risk": risk
+        }
 
-    elif amount > 100000:
-        fraud = True
-        confidence = 70
-        risk = "Medium Risk"
-
-    else:
-        fraud = False
-        confidence = 30
-        risk = "Low Risk"
-    
-    conn = sqlite3.connect("transactions.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    INSERT INTO transactions (amount, time, type, fraud, confidence, risk)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (amount, time, type, fraud, confidence, risk))
-
-    conn.commit()
-    conn.close()
-
-    return {
-        "fraud": fraud,
-        "confidence": confidence,
-        "risk": risk
-    }
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/history")
 def get_history():
