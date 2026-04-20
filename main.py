@@ -103,6 +103,9 @@ def predict(data: dict):
 
         if time > 25 or amount > 500000:
             fraud = True
+        
+        elif amount < 1000000 and time < 2:
+            fraud = False
 
         elif amount < 1000 and time > 40:
             fraud = True
