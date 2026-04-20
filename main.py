@@ -113,15 +113,16 @@ def predict(data: dict):
 
         else:
             input_data = np.array([[amount, time]])
-            prediction = model.predict(input_data)[0]
+                                                        
+            prob = model.predict_proba(input_data)[0][1]
 
-            if prediction == 1:
+            if prob > 0.3:
                 fraud = True
-                confidence = 80
+                confidence = int(prob * 100)
                 risk = "High Risk"
             else:
                 fraud = False
-                confidence = 30
+                confidence = int((1 - prob) * 100)
                 risk = "Low Risk"
 
         # Save to DB
