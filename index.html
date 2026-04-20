@@ -112,42 +112,46 @@
 
 <script>
 async function checkFraud() {
-    let amount = document.getElementById("amount").value;
-    let time = document.getElementById("time").value;
-    let type = document.getElementById("type").value || "UPI";
+  const amount = document.getElementById("amount").value;
+  const time = document.getElementById("time").value;
+  const type = document.getElementById("type").value;
 
-    let resultDiv = document.getElementById("result");
+  const resultDiv = document.getElementById("result");
 
-    resultDiv.innerHTML = `
-        <div class="loader"></div>
-        Analyzing transaction...
-    `;
-    await new Promise(r => setTimeout(r, 800));
+  resultDiv.innerHTML = "⏳ Analyzing transaction...";
 
-    try {
-        let response = await fetch("https://fraud-detection-mdbv.onrender.com/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                amount: amount,
-                time: time,
-                type: type
-            })
-        });
+  try {
+    const response = await fetch("https://fraud-detection-mdbv.onrender.com/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        amount: amount,
+        time: time,
+        type: type
+      })
+    });
 
-        let data = await response.json();
-
-
-    } catch (error) {
-        console.error(error);
-        resultDiv.innerHTML = "Error connecting to server";
-    }
+    const data = await response.json();
 
     resultDiv.innerHTML = `
-      ${data.fraud ? "❌ FRAUD DETECTED" : "✅ SAFE TRANSACTION"}
+      <div style="
+        padding: 15px;
+        border-radius: 10px;
+        background-color: ${data.fraud ? '#ff4d4d' : '#4CAF50'};
+        color: white;
+        text-align: center;
+      ">
+        ${data.fraud ? "❌ FRAUD DETECTED" : "✅ SAFE TRANSACTION"}
+      </div>
     `;
+
+  } catch (error) {
+    console.error(error);
+    resultDiv.innerHTML = "❌ Error connecting to server";
+  }
+}
 
 async function loadHistory() {
     let response = await fetch("https://fraud-detection-mdbv.onrender.com/history");
