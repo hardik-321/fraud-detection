@@ -99,38 +99,38 @@ def predict(data: dict):
         time = float(data.get("time"))
         type_ = data.get("type")
 
-      # Realistic fraud scoring system
+    # Realistic dynamic scoring system
 
-        score = 0
+    score = 0
 
-        # Amount scoring
-        if amount > 100000:
-            score += 40
-        elif amount > 50000:
-            score += 25
-        elif amount > 20000:
-            score += 10
+    # Amount scoring (dynamic)
+    if amount > 0:
+        score += min(50, amount / 100000)
 
-        # Time / frequency scoring
-        if time > 200:
-            score += 40
-        elif time > 100:
-            score += 25
-        elif time > 50:
-            score += 10
+    # Time / frequency scoring
+    if time > 0:
+        score += min(50, time / 5)
 
-        # Combined behavior
-        if amount < 1000 and time > 100:
-            score += 30
+    # Behavior anomaly rules
+    if amount < 1000 and time > 100:
+        score += 30
 
-        if amount > 50000 and time < 10:
-            score += 20
+    if amount > 50000 and time < 5:
+        score -= 20
 
-        # Final decision (ONLY fraud boolean for your DB)
-        if score >= 50:
+    # Type-based risk
+    if type_ == "International":
+        score += 20
+
+    # FINAL DECISION
+        if score >= 70:
+            fraud = True
+        elif score >= 40:
             fraud = True
         else:
             fraud = False
+
+        print("SCORE:", score)
 
         # Save to DB
         cursor.execute(
