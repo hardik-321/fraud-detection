@@ -107,7 +107,7 @@
         border:1px solid #ccc;
         padding:10px;
     "></div>
-    <div id="result"></div>
+    <div id="result" style="display:none;"></div>
 </div>
 
 <script>
@@ -151,6 +151,7 @@ async function checkFraud() {
     console.error(error);
     resultDiv.innerHTML = "❌ Error connecting to server";
   }
+  resultDiv.style.display = "block";
 }
 
 async function loadHistory() {
