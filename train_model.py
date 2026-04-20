@@ -20,7 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 # Create pipeline
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
-    ('model', RandomForestClassifier())
+    ('model', RandomForestClassifier(class_weight='balanced'))
 ])
 
 # Train model
