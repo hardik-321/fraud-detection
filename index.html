@@ -195,12 +195,39 @@ async function loadHistory() {
 
     table += `</table></div>`;
 
-    resultDiv.innerHTML = table;
+    resultDiv.innerHTML = `
+  <div style="position: relative;">
+
+    <button onclick="closeHistory()" 
+      style="
+        position:absolute;
+        top:5px;
+        right:10px;
+        background:red;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        padding:5px 10px;
+      ">
+      ✖
+    </button>
+
+    ${table}
+
+  </div>
+`;
 
   } catch (error) {
     console.error(error);
     resultDiv.innerHTML = "❌ Error loading history";
   }
+}
+
+function closeHistory() {
+  const resultDiv = document.getElementById("result");
+  resultDiv.style.display = "none";
+  resultDiv.innerHTML = "";
 }
 </script>
 
