@@ -99,26 +99,36 @@ def predict(data: dict):
         time = float(data.get("time"))
         type_ = data.get("type")
 
-       # Final human-based fraud logic
+      # Realistic fraud scoring system
 
-        if time > 10 or amount > 2500000:
+        score = 0
+
+        # Amount scoring
+        if amount > 100000:
+            score += 40
+        elif amount > 50000:
+            score += 25
+        elif amount > 20000:
+            score += 10
+
+        # Time / frequency scoring
+        if time > 200:
+            score += 40
+        elif time > 100:
+            score += 25
+        elif time > 50:
+            score += 10
+
+        # Combined behavior
+        if amount < 1000 and time > 100:
+            score += 30
+
+        if amount > 50000 and time < 10:
+            score += 20
+
+        # Final decision (ONLY fraud boolean for your DB)
+        if score >= 50:
             fraud = True
-        
-        elif amount < 1000000 and time < 2:
-            fraud = False
-
-        elif amount < 1000 and time > 40:
-            fraud = True
-
-        elif amount > 20000 and time < 10:
-            fraud = False
-
-        elif amount > 50000 and time < 50:
-            fraud = True
-
-        elif amount > 100000:
-            fraud = True
-
         else:
             fraud = False
 
