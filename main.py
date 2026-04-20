@@ -110,8 +110,6 @@ def predict(data: dict):
         if type_ == "International":
             fraud = True
 
-        if time < 3 or time > 23:
-            fraud = True
 
         if amount < 500 and time > 100:
             fraud = True
