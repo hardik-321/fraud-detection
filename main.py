@@ -103,6 +103,21 @@ def predict(data: dict):
 
         score = 0
 
+        if type_ == "International":
+            fraud = True
+
+        if time < 3 or time > 23:
+            fraud = True
+
+        if amount < 500 and time > 100:
+            fraud = True
+
+        if amount > 1000000:
+            fraud = True
+
+        if amount < 1000 and time > 200:
+            fraud = True
+
         # Amount scoring
         if amount > 100000:
             score += 40
