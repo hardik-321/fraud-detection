@@ -101,7 +101,7 @@ def predict(data: dict):
 
        # Final human-based fraud logic
 
-        if time > 200:
+        if time > 25:
             fraud = True
 
         elif amount < 1000 and time > 40:
