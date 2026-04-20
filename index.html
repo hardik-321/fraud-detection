@@ -139,36 +139,16 @@ async function checkFraud() {
 
         let data = await response.json();
 
-        resultDiv.innerHTML =
-            (data.fraud ? "⚠ FRAUD DETECTED" : "✅ SAFE TRANSACTION") +
-            "<br>Confidence: " + data.confidence + "%" +
-            "<br>Risk: " + data.risk;
 
     } catch (error) {
         console.error(error);
         resultDiv.innerHTML = "Error connecting to server";
     }
 
-    let riskLevel = "";
-    let badgeClass = "";
-
-    if (data.confidence > 70) {
-        riskLevel = "High Risk";
-        badgeClass = "high";
-    } else if (data.confidence > 40) {
-        riskLevel = "Medium Risk";
-        badgeClass = "medium";
-    } else {
-        riskLevel = "Low Risk";
-        badgeClass = "low";
-    }
-
     resultDiv.innerHTML = `
-        ${data.fraud ? "⚠ FRAUD DETECTED" : "✅ SAFE TRANSACTION"}<br>
-        Confidence: ${data.confidence}%<br>
-        <span class="badge ${badgeClass}">${riskLevel}</span>
+      ${data.fraud ? "❌ FRAUD DETECTED" : "✅ SAFE TRANSACTION"}
     `;
-}
+
 async function loadHistory() {
     let response = await fetch("https://fraud-detection-mdbv.onrender.com/history");
     let data = await response.json();
