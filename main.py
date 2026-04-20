@@ -99,43 +99,36 @@ def predict(data: dict):
         time = float(data.get("time"))
         type_ = data.get("type")
 
-        # Prepare input for model
-        # Normalize inputs (VERY IMPORTANT)
-        amount = min(amount, 5000)
-        time = min(time, 200)
+       # Final human-based fraud logic
 
-        # Hybrid logic (AI + anomaly detection)
-
-        if amount > 1000000 or time > 2:
+        if time > 200:
             fraud = True
-            confidence = 95
-            risk = "High Risk"
+
+        elif amount < 1000 and time > 40:
+            fraud = True
+
+        elif amount > 20000 and time < 10:
+            fraud = False
+
+        elif amount > 50000 and time < 50:
+            fraud = True
+
+        elif amount > 100000:
+            fraud = True
 
         else:
-            input_data = np.array([[amount, time]])
-                                                        
-            prob = model.predict_proba(input_data)[0][1]
-
-            if prob > 0.3:
-                fraud = True
-                confidence = int(prob * 100)
-                risk = "High Risk"
-            else:
-                fraud = False
-                confidence = int((1 - prob) * 100)
-                risk = "Low Risk"
+            fraud = False
 
         # Save to DB
         cursor.execute(
-            "INSERT INTO transactions (amount, time, type, fraud, confidence, risk) VALUES (?, ?, ?, ?, ?, ?)",
-            (amount, time, type_, fraud, confidence, risk)
+            "INSERT INTO transactions (amount, time, type, fraud) VALUES (?, ?, ?, ?)",
+            (amount, time, type_, fraud)
         )
+        
         conn.commit()
 
         return {
-            "fraud": fraud,
-            "confidence": confidence,
-            "risk": risk
+            "fraud": fraud
         }
 
     except Exception as e:
