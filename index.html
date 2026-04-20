@@ -97,6 +97,11 @@
     <input type="number" id="time" placeholder="Enter Time">
     <input type="text" id="type" placeholder="Type (UPI/Card/International)">
 
+    <select id="location">
+      <option value="India">India</option>
+      <option value="Other">Other</option>
+    </select>
+
     <button onclick="checkFraud()">Check Transaction</button>
     <button onclick="loadHistory()">View Transaction History</button>
 
@@ -129,7 +134,8 @@ async function checkFraud() {
       body: JSON.stringify({
         amount: amount,
         time: time,
-        type: type
+        type: type,
+        location: document.getElementById("location").value
       })
     });
 

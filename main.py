@@ -98,10 +98,14 @@ def predict(data: dict):
         amount = float(data.get("amount"))
         time = float(data.get("time"))
         type_ = data.get("type")
+        location = data.get("location")
 
       # Realistic fraud scoring system
 
         score = 0
+
+        if location == "Other":
+            fraud = True
 
         if type_ == "International":
             fraud = True
