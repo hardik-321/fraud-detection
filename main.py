@@ -100,32 +100,25 @@ def predict(data: dict):
         type_ = data.get("type")
         location = data.get("location")
 
-      # Realistic fraud scoring system
-
+        # Realistic fraud scoring system
         score = 0
+        suspicious = False
 
+        # Location risk
         if location == "Other":
-            fraud = True
+            score += 20
+            suspicious = True
 
+        # Type risk
         if type_ == "International":
-            fraud = True
-
-
-        if amount < 500 and time > 100:
-            fraud = True
-
-        if amount > 1000000:
-            fraud = True
-
-        if amount < 1000 and time > 200:
-            fraud = True
+            score += 30
 
         # Amount scoring
-        if amount > 100000:
+        if amount > 200000:
             score += 40
-        elif amount > 50000:
+        elif amount > 100000:
             score += 25
-        elif amount > 20000:
+        elif amount > 50000:
             score += 10
 
         # Time / frequency scoring
@@ -136,15 +129,15 @@ def predict(data: dict):
         elif time > 50:
             score += 10
 
-        # Combined behavior
+        # Behavior pattern
         if amount < 1000 and time > 100:
             score += 30
 
-        if amount > 50000 and time < 10:
-            score += 20
+        if amount > 50000 and time < 5:
+            score += 5   # large but rare → mostly safe
 
-        # Final decision (ONLY fraud boolean for your DB)
-        if score >= 50:
+        # FINAL DECISION
+        if score >= 60:
             fraud = True
         else:
             fraud = False
